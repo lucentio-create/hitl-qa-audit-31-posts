@@ -1,76 +1,57 @@
-PRISM — Privilege Review Multi-Agent System (Design)
-Status: Design document. Not built. Not tested in production.
+hitl-qa-audit-31-posts
+A human QA audit of 31 labelled social media posts, using a 6-point checklist.
 
-PRISM is a design for a privilege review / QC workflow. It describes how multiple review agents and a human reviewer would work together, with a human gate and an audit trail. It is not a running system.
+Data note: The 31 posts are synthetic practice data written for training, not real social media data. This is a simulated QC audit, not a production project. No AI model was tested. I audited labels and priority flags that were already assigned.
 
-Problem it is designed for
-In eDiscovery / records review, privilege review needs:
+What I did
+Acting as QC, I checked each post's label (Complaint, Inquiry, Praise, Spam) and priority flag against six criteria, marked Pass or Fail, and wrote a reason for every Fail.
 
-Consistent application of privilege rules
-A clear reason for every privilege call
-A human reviewer who makes the final decision
-An audit trail that shows who / what decided what, and why
-PRISM is a proposal for how to structure that, not a claim that it is already working.
+Audit checklist
+ID	Criterion	What it checks
+C1	Intent label	The label matches the real meaning of the post
+C2	Dialect / Pidgin	Fails only if misreading the dialect caused a wrong label
+C3	Urgency flag	Urgent complaints (money stuck, failed charges, outages) are flagged Yes
+C4	Spam handling	Spam is labelled Spam, and genuine posts are not wrongly labelled Spam
+C5	Ambiguity	Sarcasm or dual-intent posts get a sensible label
+C6	Completeness	Every post has a label
+Results (31 posts)
+Error rate = posts failed / posts audited x 100
 
-Proposed architecture
-Agent 1 — Triage
+Posts audited: 31
+Posts with at least one Fail: 7 (23%)
+Total criterion failures: 11 (one post can fail several criteria, e.g. Post 24 failed C1, C2 and C3)
+Criterion	Fails	Failed Posts
+C1	3	1, 23, 24
+C2	1	24
+C3	5	3, 5, 15, 24, 28
+C4	2	1, 23
+C5	0	None
+C6	0	None
+Findings
+Most common error: C3 (urgency flag), 5 of 31 posts.
+Flag: Yes was often missing on financial loss (stuck refunds, failed debits, overcharges) and major outages, even though similar complaints in the same set were flagged correctly.
 
-Checks completeness: Does the document have text, metadata, and a privilege tag?
-Flags missing data for human review.
-Agent 2 — Privilege Classifier (proposed)
+Next: C1 (intent label), 3 of 31 posts.
+Example (Post 1): A genuine price query was labelled Spam. This is a false positive, so it fails C1 and C4.
 
-Applies written privilege guidelines to label: Privileged / Not Privileged / Needs Human Review.
-Must output a rationale citing the guideline rule used, not just a label.
-Agent 3 — QC / Consistency Checker
+Dialect example (Post 24): A Pidgin financial phrase was misread, which caused a wrong intent label and a missing urgency flag. This is why C2 and C3 are checked separately from C1 - a dialect miss can cause two downstream errors.
 
-Checks for conflicts: e.g. same email thread labelled differently, or privilege label without a rationale.
-Flags edge cases: mixed content, forwarded emails, attachments with different privilege.
-Human Review Gate — Final Decision
+Recommendations
+High (C3, 5 fails): Require Flag: Yes for any post citing lost or stuck funds, unauthorized debits, or outages over 24 hours.
 
-A human reviewer sees the agent proposal, rationale, and source document.
-Human can Accept, Overturn, or Send for Second Review.
-No document is marked Privileged without human approval. The agents propose, the human decides.
-Audit trail (design)
-Every decision would log:
+High (C1, 3 fails): Add worked examples to the guidelines showing how to tell intent when a post mixes complaint, question and praise.
 
-Document ID
-Agent proposal + rationale + guideline rule cited
-Human decision + human rationale
-Timestamp
-Final label
-This is required for chain of custody and for explaining a privilege call later.
+Medium (C4, 2 fails): Make spam rules work both ways. Scams must not pass as Inquiries or Praise (Post 23), and genuine price queries must not be tagged Spam (Post 1).
 
-Manual test scenarios (paper walkthrough, not code)
-These are 3 paper scenarios I walked through manually to test the design logic. No code was run.
-
-Scenario 1 — Clear Privileged Email
-
-Email from lawyer to client asking for legal advice.
-Expected: Agent proposes Privileged, human accepts. Passes design check.
-Scenario 2 — Mixed Thread
-
-Thread starts as business update, later adds a lawyer asking for legal advice.
-Expected: Agent flags Needs Human Review, human splits the review by message, not by thread. Tests edge-case handling.
-Scenario 3 — False Positive Risk
-
-Business email that mentions “legal” but is not legal advice.
-Expected: Agent must not auto-label Privileged on keyword alone. Must check intent against guideline. Human overturns if agent over-calls.
-What this project is NOT
-Not a running multi-agent system
-Not tested on real client data
-Not tested on production data
-Not a claim of AI accuracy
-No model was trained, fine-tuned, or evaluated
-It is a design + 3 paper scenarios to show how I think about guideline adherence, rationale writing, and human-in-the-loop QC.
+Lower (C2, 1 fail): Add Pidgin financial-phrase examples to the guidelines (Post 24).
 
 Limitations
-Design only. No code, no evaluation, no inter-annotator agreement measured.
-No real or synthetic dataset was run through it.
-Privilege rules vary by matter and jurisdiction — this design uses generic rules, not a real matter’s protocol.
-Next steps (if I build it)
-Write a short privilege guideline with worked examples and edge cases
-Build a small synthetic dataset (20-30 docs, no PII, no real client data)
-Run a pilot with Label Studio or a spreadsheet: agent proposal vs human decision, measure agreement and rationale quality
-Update this README only after the pilot exists
+Synthetic data, one auditor, a sample of 31. Results show the method, not real-world error rates. With a second reviewer, I would have both audit independently, compare Pass/Fail calls, discuss each disagreement against the written guideline, and update the guideline where it was unclear.
+
 Files
-README.md: this design document (only file for now)
+31_practice_posts_raw.csv: the 31 practice posts with Original_Label, Original_Flag, Audit decision and reason for every Fail
+How to reproduce
+Open 31_practice_posts_raw.csv
+For each Post_ID, check the label and flag against C1 to C6 in the checklist above
+Mark Pass or Fail per criterion and write a reason for every Fail
+Count posts with at least one Fail to get the error rate
