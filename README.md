@@ -1,8 +1,8 @@
-# hitl-qa-audit-50-posts
+# hitl-qa-audit-31-posts
 
-A human QA audit of 50 labelled social media posts, using a 6-point checklist.
+A human QA audit of 31 labelled social media posts, using a 6-point checklist.
 
-> **Data note:** The 50 posts are **synthetic practice data** written for training, not real social media data. This is a simulated QC audit, not a production project. No AI model was tested. I audited labels and priority flags that were already assigned.
+> **Data note:** The 31 posts are **synthetic practice data** written for training, not real social media data. This is a simulated QC audit, not a production project. No AI model was tested. I audited labels and priority flags that were already assigned.
 
 ## What I did
 Acting as QC, I checked each post's label (Complaint, Inquiry, Praise, Spam) and priority flag against six criteria, marked Pass or Fail, and wrote a reason for every Fail.
@@ -18,10 +18,10 @@ Acting as QC, I checked each post's label (Complaint, Inquiry, Praise, Spam) and
 | C5 | Ambiguity | Sarcasm or dual-intent posts get a sensible label |
 | C6 | Completeness | Every post has a label |
 
-## Results (50 posts)
+## Results (31 posts)
 Error rate = posts failed ÷ posts audited × 100
 
-- Posts audited: 50
+- Posts audited: 31
 - Posts with at least one Fail: **11 (22%)**
 - Total criterion failures: 17 (one post can fail several criteria, e.g. Post 24 failed C1, C2 and C3)
 
@@ -35,7 +35,7 @@ Error rate = posts failed ÷ posts audited × 100
 | C6 | 0 | None |
 
 ## Findings
-- **Joint most common errors:** C1 (intent label) and C3 (urgency flag), 6 of 50 posts each.
+- **Joint most common errors:** C1 (intent label) and C3 (urgency flag), 6 of 31 posts each.
 - **C3 pattern:** `Flag: Yes` was often missing on financial loss (stuck refunds, failed debits, overcharges) and major outages, even though similar complaints elsewhere (Posts 37, 46) were flagged correctly.
 - **Example (Post 1):** A genuine price query was labelled Spam. This is a false positive, so it fails C1 and C4.
 
@@ -49,4 +49,4 @@ Error rate = posts failed ÷ posts audited × 100
 Synthetic data, one auditor, a sample of 50. Results show the method, not real-world error rates. With a second reviewer, I would have both audit independently, compare Pass/Fail calls, discuss each disagreement against the written guideline, and update the guideline where it was unclear.
 
 ## Files
-- `50_practice_posts_raw.csv`: the 50 practice posts
+- `31_practice_posts_raw.csv`: the 31 practice posts
